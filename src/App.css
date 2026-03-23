@@ -1,0 +1,17 @@
+.flex-center-container {
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    height:800px; /* 父容器需要有高度才能看到垂直居中 */
+    border:none;
+    flex-direction: column;
+}
+.flex-center-item {
+    background-color: #00000000;
+    color: white;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 80%; /* 可以有彈性寬度 */
+    font-size: 80px;
+}

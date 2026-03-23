@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@200..900&family=Inconsolata:wght@200..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+
+body {
+    font-family: "Chiron GoRound TC", sans-serif;
+    margin:0;
+    padding:0;
+    background-color: '#fcfcfc';
+    color:'#37474F'
+}
+
+h1, h2, h3, h4, h5, h6, input, button, textarea {
+	font-family: inherit;
+}
+
+/* 呼吸燈動畫：讓骨架屏有在載入的感覺 */
+@keyframes pulse {
+	0% { opacity: 1; }
+	50% { opacity: 0.5; }
+	100% { opacity: 1; }
+}
+
+.skeleton-tag {
+	height: 34px; 
+	background-color: #e2e5e7;
+	border-radius: 20px;
+	animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* 預設：小螢幕 (手機/縮小視窗) -> 標籤在上方橫向排列 */
+.search-layout {
+	display: flex;
+	flex-direction: column;
+
+}
+
+.tag-sidebar {
+	display: flex;
+	overflow-x: auto; 
+	padding-bottom: 10px;
+	border-bottom: 1px solid #ddd;
+	gap: 10px;
+	white-space: nowrap;
+    margin-left: -2rem;
+    margin-right: -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+
+/* 放大螢幕  -> 標籤在左側直向排列 */
+@media (min-width: 1200px) {
+	.search-layout {
+		flex-direction: row; 
+		align-items: flex-start;
+	}
+	
+	.tag-sidebar {
+		width: 200px;
+		flex-direction: column; 
+		border-bottom: none;
+		border-right: 1px solid #ddd;
+		height: calc(100vh - 60px); 
+		position: sticky;
+		top: 0;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+	}
+}
+
+/* 讓外層容器成為定位基準點 */
+.custom-tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 提示泡泡的本體設計 */
+.custom-tooltip::after {
+    content: attr(data-tooltip); /* 抓取 HTML 標籤上的 data-tooltip 文字 */
+    position: absolute;
+    top: 100%;                   /* 讓泡泡出現在 icon 的正下方 */
+    left: 50%;
+    transform: translateX(-50%); /* 完美置中對齊 */
+    margin-top: 8px;             /* 與 icon 保持一點呼吸空間 */
+    
+    /* 視覺設計 */
+    background-color: #333;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    white-space: nowrap; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+    /* 動畫與隱藏狀態 */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; 
+    transition: all 0.2s ease;
+    z-index: 1000;
+}
+
+/* 當滑鼠移過去時，顯示泡泡！ */
+.custom-tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}

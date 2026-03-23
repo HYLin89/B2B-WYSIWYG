@@ -1,0 +1,528 @@
+:root {
+    --header-height: 74px; 
+}
+
+/* 全局樣式基礎
+html, body, #root {
+    height: 100%;
+    margin: 0;
+
+} */
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    font-family: sans-serif;
+    overflow: hidden;
+}
+
+/* --- 全域標頭的 Wrapper --- */
+.global-header-wrapper {
+    height: var(--header-height);
+    position: relative;
+    z-index: 200; /* 最高層級，不被任何東西遮蔽 */
+    background: white; /* 確保有實體背景，不會透視下方的動畫 */
+    /* 如果 Headers.jsx 內有 border-bottom 這裡可以不用加 */
+}
+
+/* --- 固定於右上角的面板 (草稿/標籤) --- */
+.fixed-top-right-panel {
+    position: fixed;
+    /* 距離頂部 = 標頭高度 + 20px的間距，確保不被標頭遮擋 */
+    top: calc(var(--header-height) + 20px); 
+    right: 40px;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 50; /* 層級低於工具列 (100) */
+    pointer-events: auto;
+}
+
+/* --- A. 編輯工具列 (從標頭下方滑入) --- */
+.toolbar-overlay {
+    position: fixed;
+    top: var(--header-height); /* 起點位於標頭正下方 */
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-bottom: 1px solid #eaeaea;
+    
+    z-index: 100; /* 層級高於右上角面板 (50)，滑入時會遮蔽標籤區 */
+    /* 初始位置：向上平移自身高度，藏在標頭的後方 */
+    transform: translateY(-100%); 
+    opacity: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    pointer-events: none;
+}
+
+.toolbar-overlay.open {
+    transform: translateY(0); /* 滑出到正常位置 */
+    opacity: 1;
+    pointer-events: auto;
+    background-color: #eaeaea;
+    border: 1px solid #D3D3D3;
+    border-radius: 2%;
+}
+
+.toolbar-content {
+    padding: 10px 10px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+}
+/* 工具列區塊分隔線 */
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background-color: #ddd;
+    margin: 0 4px;
+}
+
+/* 讓按鈕在滑鼠懸浮時有一點回饋感 */
+.clean-btn:hover {
+    color: #9932CC; /* 使用您的主題紫 */
+    transition: color 0.2s ease;
+}
+
+/* 確保 disabled 的按鈕 (如無法復原時) 呈現灰色且不能點擊 */
+.clean-btn:disabled {
+    color: #eee;
+    cursor: not-allowed;
+}
+
+/* --- 主要內容捲動區 --- */
+.editor-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px calc(50vw - 350px);
+    -webkit-overflow-scrolling: touch;
+}
+
+.editor-main-content {
+    margin-top: 20px;
+}
+
+/* 標題與黑線 */
+.title-area {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.title-area::before {
+    content: '';
+    position: absolute;
+    left: -16px;
+    top: 10%;
+    height: 80%;
+    width: 4px;
+    background-color: #222;
+}
+
+.title-input {
+    border: none;
+    outline: none;
+    font-size: 60px;
+    font-weight: bold;
+    color:#696969;
+    width: 100%;
+    background: transparent;
+}
+
+.content-area {
+    font-size: 20px;
+    line-height: 1.6;
+    color: #333;
+    outline: none;
+}
+
+/* --- B. 底部提示區 --- */
+.hint-overlay {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    border-top: 1px solid #eaeaea;
+    
+    z-index: 100;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    pointer-events: none;
+}
+
+.hint-overlay.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hint-content {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-hint-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+/* 基礎無邊界樣式 */
+.borderless-select, 
+.borderless-input {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.tag-item {
+    font-size: 22px;
+    color: #555;
+    cursor: 'pointer';
+    display: 'flex';
+    justify-content: 'space-between';
+    align-items: 'center';
+    height: '22px'
+}
+
+.clean-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+}
+
+/* --- 客製化捲軸 (針對 Chrome, Edge, Safari 等 WebKit 瀏覽器) --- */
+
+/* 設定捲軸整體的寬度 */
+.editor-scroll-area::-webkit-scrollbar {
+    width: 8px; 
+}
+
+/* 隱藏捲軸上下方的箭頭按鈕 */
+.editor-scroll-area::-webkit-scrollbar-button {
+    display: none; 
+}
+
+/* 捲軸的軌道背景 (透明) */
+.editor-scroll-area::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+/* 捲軸滑塊本體 */
+.editor-scroll-area::-webkit-scrollbar-thumb {
+    background-color: #e0e0e0; /* 預設為極淡的灰色 */
+    border-radius: 4px;
+}
+
+/* 當滑鼠移上去時，滑塊稍微變深 */
+.editor-scroll-area::-webkit-scrollbar-thumb:hover {
+    background-color: #c0c0c0; 
+}
+
+/* --- 離開確認彈窗 (Modal) --- */
+.leave-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px); /* 背景微微模糊，Medium 風格 */
+    z-index: 9999; /* 確保在所有東西(包含 Headers)之上 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 32px 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    max-width: 400px;
+    text-align: center;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #222;
+}
+
+.modal-content p {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.btn-cancel, .btn-danger {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+.btn-cancel {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.btn-cancel:hover { background: #e4e4e4; }
+
+.btn-danger {
+    background: #ff4d4f;
+    color: white;
+}
+
+.btn-danger:hover { background: #ff7875; }
+
+/* Tiptap 編輯器本體的預設樣式 */
+.ProseMirror {
+    min-height: 300px;
+    outline: none; /* 移除點擊時的藍色外框 */
+}
+
+/* 讓編輯器內的圖片能自適應縮放，不會撐破畫面 */
+.ProseMirror img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 20px auto; /* 圖片置中 */
+}
+
+/* 佔位符樣式 (Placeholder) - 如果需要的話 */
+.ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #adb5bd;
+    pointer-events: none;
+    height: 0;
+}
+
+/* ==========================================
+   Tiptap 程式碼區塊 (Code Block) 樣式
+========================================== */
+.ProseMirror pre {
+    background: #282c34; /* 經典的深色主題背景 */
+    color: #F5F5F5;      /* 柔和的白色文字 */
+    font-family: 'Inconsolata', monospace; /* 使用等寬字體 */
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    overflow-x: auto;    /* 程式碼太長時允許橫向捲動 */
+    margin: 1.5rem 0;
+    line-height: 1.5;
+}
+
+/* 確保 pre 裡面的 code 標籤繼承外層樣式 */
+.ProseMirror pre code {
+    color: inherit;
+    padding: 0;
+    background: none;
+    font-size: 0.95rem;
+}
+
+/* 額外補充：行內程式碼 (Inline Code) 樣式，避免跟大區塊混淆 */
+.ProseMirror p code {
+    background-color: #f1f3f5;
+    color: #e83e8c;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'Inconsolata', monospace;
+}
+/* ==========================================
+   Tiptap 引用區塊 (Blockquote) 樣式
+========================================== */
+.ProseMirror blockquote {
+    border-left: 4px solid #9932CC; /* 左側粗紫線，提升視覺層次 */
+    background-color: #f8f9fa;      /* 灰底區間 */
+    padding: 12px 20px;
+    margin: 1.5rem 0;
+    border-radius: 0 8px 8px 0;     /* 僅右側圓角 */
+    color: #555;                    /* 字體稍微變淡 */
+    font-style: italic;             /* 引用文使用斜體更有感覺 (可選) */
+}
+
+/* 去除引用區塊內第一個與最後一個段落的多餘空白 */
+.ProseMirror blockquote p:first-child {
+    margin-top: 0;
+}
+.ProseMirror blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* 工具列按鈕啟用時的樣式 */
+.clean-btn.is-active {
+    color: #222;
+    font-weight: bold;
+}
+
+/* ==========================================
+   B. 底部提示區 (Hint Overlay) 樣式
+========================================== */
+/* ==========================================
+   B. 底部提示區 (Hint Overlay) 全新幻燈片樣式
+========================================== */
+.hint-overlay {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* [修改] 高度從 180px 拉高到 260px，給予充分呼吸空間 */
+    height: 260px; 
+    background: white;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.08);
+    border-top: 1px solid #eaeaea;
+    
+    z-index: 150;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out;
+    pointer-events: none;
+    
+    /* 讓內部結構能夠垂直分配空間 */
+    display: flex;
+    flex-direction: column; 
+}
+
+.hint-overlay.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 標題與關閉按鈕區塊 */
+.hint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px 0 30px;
+}
+
+.close-hint-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+    padding: 0 5px;
+}
+.close-hint-btn:hover { color: #333; }
+
+/* --- 卡片輪播區專用樣式 --- */
+.hint-carousel-wrapper {
+    position: relative;
+    /* [修改] 讓外層 Wrapper 佔滿剩餘高度，並實現完美置中 */
+    flex: 1; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px; /* 限制整體寬度，讓左右按鈕能貼在卡片兩側 */
+    margin: 0 auto; 
+}
+
+.hint-scroll-container {
+    display: flex;
+    gap: 20px; /* 卡片間距 */
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    
+    /* [新增魔法] 強制捲動時捕捉 (Snap) 到卡片中心 */
+    scroll-snap-type: x mandatory; 
+    
+    /* [修改] 寬度固定為 500px，確保可視範圍剛好只有一張卡片 */
+    width: 500px; 
+    padding: 10px 0;
+    
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.hint-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* 單張提示卡片 */
+.hint-card {
+    flex-shrink: 0;
+    /* [修改] 寬度與容器相同，實現 100% 填滿 */
+    width: 500px; 
+    /* 配合 scroll-snap-type 使用，每次滑動會自動停在中心 */
+    scroll-snap-align: center; 
+    
+    background: #fdfdfd;
+    border: 1px solid #e2e5e7;
+    border-radius: 12px;
+    padding: 20px 25px; /* 增加內邊距 */
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+.hint-card:hover { border-color: #9932CC; }
+
+/* [修改] 無邊框、透明底的左右滑動箭頭按鈕 */
+.hint-arrow-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: transparent; /* 透明背景 */
+    border: none;            /* 移除邊框 */
+    font-size: 28px;
+    color: #ccc;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding-bottom: 4px; /* 微調箭頭符號的視覺中心 */
+}
+
+/* 懸浮時變色並稍微放大 */
+.hint-arrow-btn:hover {
+    color: #9932CC;
+    transform: translateY(-50%) scale(1.2); 
+}
+
+/* 將按鈕向外推至卡片兩側 */
+.hint-arrow-left {
+    left: -40px; 
+}
+.hint-arrow-right {
+    right: -40px; 
+}
