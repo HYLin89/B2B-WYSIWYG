@@ -69,7 +69,9 @@ const router = createBrowserRouter([
 			{ path:"*", element: <ErrorPage />}
 		],
 	},
-]);
+],{
+	basename: '/B2B-WYSIWYG'
+});
 export default function App() {
 	return <RouterProvider router={router} />;
 }
