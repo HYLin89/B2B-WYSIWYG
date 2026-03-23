@@ -113,6 +113,12 @@ const default_cover = import.meta.env.VITE_DEFAULT_COVER_URL;
 
 export default function Portfolio() {
     const { account: account } = useParams();
+
+    const isValidAcc = /\w/.test(account);
+    if (!isValidAcc){
+        throw new Error("Invalid account format");
+    }
+
     const navigate = useNavigate();
     const scrollContainerRef = useRef();
 
