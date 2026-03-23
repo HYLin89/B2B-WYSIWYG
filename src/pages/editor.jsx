@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { newArticle, coverImg, contentImgs ,updateArticle, deleteArticle  } from '../service/articleService';
 import './editor.css'
 
-const default_cover = import.meta.env.VITE_DEFAULT_COVER_URL;
+const default_cover = import.meta.env.VITE_DEFAULT_COVER_URL || 'https://svxrqtsfyjzeeyrjrezu.supabase.co/storage/v1/object/public/imgs/default_cover.jpg';
 
 const EditorPage = () => {
 
