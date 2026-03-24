@@ -6,8 +6,6 @@ import MsgModule from "../components/messageModule";
 
 export default function Mailbox(){
 
-    const current_user = localStorage.getItem('currentUser_user_name');
-
     const [messageList, setMessageList] = useState([]);
     const [messageMeta, setMsgMeta] = useState({total_pages:1, current_page:1});
     const [currentPage, setCurrentPage] = useState(1);
@@ -83,7 +81,7 @@ export default function Mailbox(){
         setIsLoadingMsg(true);
 
         const currentMsgInfo = messageList.find(m => m.id === messageId);
-        const current_user = localStorage.getItem('currentUser_user_name') || ""; 
+        const current_user = localStorage.getItem('currentUser_account') || ""; 
         const displayTitle = currentMsgInfo?.title || "未知文章";
         const isCurrentlyUnRead = currentMsgInfo && !currentMsgInfo.is_read;
         const isSentByMe = currentMsgInfo && currentMsgInfo.from === current_user;

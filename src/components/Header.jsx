@@ -108,7 +108,7 @@ export default function Header() {
 				console.log('websocket connected');
 			});
 			socket.on('new_message', (data)=>{
-				toast.info(`來自 ${ data.user_name? data.user_name : '用戶' } 的信件 !`);
+				toast.info(`來自 ${ data.account? data.account : '用戶' } 的信件 !`);
 				setNewMsgCount(prevCount => prevCount + 1);
 			})
 		} catch(err){

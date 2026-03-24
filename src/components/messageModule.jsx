@@ -36,9 +36,10 @@ export default function MsgModule({
                     'message id is required':'無效操作',
                     'requirements cannot be blanked':'信件內容不可留白！',
                     'target not exists':'文章已遺失',
+                    'account not verified':'請驗證帳戶後再留言！',
                     'invalid actions, message to your own articles are forbiddened':'無法對自己的文章發表訊息' 
                 };
-                const invalid = ['no such user','login expired, please retry','invalid token or unauthorized'];
+                const invalid = ['login expired, please retry','invalid token or unauthorized'];
                 const response_msg = err.response?.data?.msg;
                 if (invalid.includes(response_msg)){
                     toast.error('登入已失效，請重新登入');
