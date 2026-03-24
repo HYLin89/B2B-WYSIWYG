@@ -85,7 +85,8 @@ export default function Mailbox(){
         const currentMsgInfo = messageList.find(m => m.id === messageId);
         const current_user = localStorage.getItem('currentUser_user_name') || ""; 
         const displayTitle = currentMsgInfo?.title || "未知文章";
-        const isCurrentlyUnRead = currentMsgInfo && !currentMsgInfo.is_read; 
+        const isCurrentlyUnRead = currentMsgInfo && !currentMsgInfo.is_read;
+        const isSentByMe = currentMsgInfo && currentMsgInfo.from === current_user;
 
         getMessage(messageId)
         .then((response)=>{
@@ -105,13 +106,10 @@ export default function Mailbox(){
                 content:formattedContent,
                 articleId:raw.length>0? raw[0].article_id : null
             });
-            if (isCurrentlyUnRead && formattedContent.length > 0 ){
+
+            if (isCurrentlyUnRead && !isSentByMe && formattedContent.length > 0 ){
                 const rootMsgId = formattedContent[0].parent_id ? formattedContent[0].parent_id : formattedContent[0].id;
 
-                if (current_user == formattedContent[0].sender){
-                    return
-                };
-                
                 changeIsRead(rootMsgId)
                 .then(()=>{
                     setMessageList(prev => prev.map(m => m.id === messageId ? {...m, is_read:true} : m));
