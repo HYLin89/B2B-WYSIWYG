@@ -107,6 +107,11 @@ export default function Mailbox(){
             });
             if (isCurrentlyUnRead && formattedContent.length > 0 ){
                 const rootMsgId = formattedContent[0].parent_id ? formattedContent[0].parent_id : formattedContent[0].id;
+
+                if (current_user == formattedContent[0].sender){
+                    return
+                };
+                
                 changeIsRead(rootMsgId)
                 .then(()=>{
                     setMessageList(prev => prev.map(m => m.id === messageId ? {...m, is_read:true} : m));
