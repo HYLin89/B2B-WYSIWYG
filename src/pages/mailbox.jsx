@@ -93,6 +93,7 @@ export default function Mailbox(){
             
             const formattedContent = raw.map(item =>({
                 id: item.msg_id,
+                parent_id:item.parent_id,
                 is_me: item.user === current_user,
                 sender: item.user,
                 content: item.content,
@@ -102,16 +103,15 @@ export default function Mailbox(){
             setMessage({
                 title:displayTitle,
                 content:formattedContent,
-                articleId:raw.length>0? raw[0].length : null
+                articleId:raw.length>0? raw[0].article_id : null
             });
             if (isCurrentlyUnRead && formattedContent.length > 0 ){
                 const rootMsgId = formattedContent[0].parent_id ? formattedContent[0].parent_id : formattedContent[0].id;
                 changeIsRead(rootMsgId)
                 .then(()=>{
-                    setMessageList(m => m.id === messageId? {...m, is_read:true} : m);
+                    setMessageList(prev => prev.map(m => m.id === messageId ? {...m, is_read:true} : m));
                 })
                 .catch(err=>{
-                    setError(err.message);
                     const errorDict ={
                         'message id is required':'無效操作',
                         'target not exists':'訊息已遺失'

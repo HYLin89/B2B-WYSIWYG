@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { newArticle, coverImg, contentImgs ,updateArticle, deleteArticle  } from '../service/articleService';
 import './editor.css'
 
-const default_cover = import.meta.env.VITE_DEFAULT_COVER_URL;
+const default_cover = import.meta.env.VITE_DEFAULT_COVER_URL || 'https://svxrqtsfyjzeeyrjrezu.supabase.co/storage/v1/object/public/imgs/default_cover.jpg';
 
 const EditorPage = () => {
 
@@ -387,7 +387,7 @@ const EditorPage = () => {
         }
     ];
 
-    // 因為卡片變寬了，將滑動距離從 280 調整為 380 確保一次剛好滑過一張卡片
+    // 將滑動距離從 280 調整為 380 確保一次剛好滑過一張卡片
     const scrollHintLeft = () => {
         if (hintScrollRef.current) {
             hintScrollRef.current.scrollBy({ left: -520, behavior: 'smooth' });
@@ -411,7 +411,7 @@ const EditorPage = () => {
             setHasUChgs(false);
             const user = localStorage.getItem('currentUser_account');
             if (user){
-                navigate(`/@${user}`, { replace: true });
+                navigate(`/${user}`, { replace: true });
             }else{
                 navigate(`/`, { replace: true });
             }

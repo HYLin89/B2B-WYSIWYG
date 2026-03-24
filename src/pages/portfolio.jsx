@@ -116,9 +116,9 @@ export default function Portfolio() {
 
     const isValidAcc = /\w/.test(account);
     if (!isValidAcc){
-        throw new Error("Invalid account format");
-    }
-
+        throw new Error("Invalid account format")
+    };
+    
     const navigate = useNavigate();
     const scrollContainerRef = useRef();
 
