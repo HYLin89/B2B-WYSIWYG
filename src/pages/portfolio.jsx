@@ -503,7 +503,7 @@ export default function Portfolio() {
                         <p style={{ color: '#999', margin: '20px 0' }}>目前沒有任何文章。</p>
                     ) : (
                         currentList.map(article => (
-                            <div key={article.id} onClick={() => navigate(`/article/${article.id}`)} style={{ ...cardStyle, position:'relative'}}>
+                            <div key={article.id} onClick={(e) => {activeTab === 'draft' ?  editHandler(e, article.id, currentType) : navigate(`/article/${article.id}`)}} style={{ ...cardStyle, position:'relative'}}>
                             {activeTab === 'public' && (
                                 <div onClick={e=>{toggleBookmark(e, article.id)}}>
                                     <div  style={{display: 'flex', alignItems: 'center', gap: '4px', zIndex:'999', backgroundColor:'#00000000',position:'absolute',right:'20px'}}>
