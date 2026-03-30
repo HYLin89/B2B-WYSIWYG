@@ -123,55 +123,58 @@ export default function Home(){
         navigate(`/article/${article.id}`);
     }
 
-    const toggleBookmark = (e, id_) =>{
+    const toggleBookmark = (e, id_, userName) =>{
         e.preventDefault();
         e.stopPropagation();
-
-        if (localStorage.getItem('token')){
-            const isCurrentlyMarked = userbmkIds.includes(id_);
-            if (isCurrentlyMarked) {
-                setbmkIds(prev => prev.filter(id => id !== id_));
-            } else {
-                setbmkIds(prev => [...prev, id_]);
-            };
-
-            setArticles(prevArticles => 
-                prevArticles.map(article => {
-                    if (article.id === id_) {
-                        return {
-                            ...article,
-                            claps: isCurrentlyMarked? (article.claps - 1 ): (article.claps + 1 )
-                        };
-                    };
-                    return article;
-                })
-            );
-
-            addBookMark(id_)
-            .then(()=>{
-                toast.success((isCurrentlyMarked ? '已取消書籤' : '有品味的選擇！'));
-            })
-            .catch((err)=>{
-                const errorDict ={
-                    'article id is required':'無效操作',
-                    'article not exists':'文章已遺失'
+        const isOwner = localStorage.getItem('currentUser_user_name') === userName;
+        if (!isOwner){
+            if (localStorage.getItem('token')){
+                const isCurrentlyMarked = userbmkIds.includes(id_);
+                if (isCurrentlyMarked) {
+                    setbmkIds(prev => prev.filter(id => id !== id_));
+                } else {
+                    setbmkIds(prev => [...prev, id_]);
                 };
-                const invalid = ['No such user','login expired, please retry','invalid token or unauthorized'];
-                const response_msg = err.response?.data?.msg;
-                if (invalid.includes(response_msg)){
-                    toast.error('登入已失效，請重新登入');
-                    localStorage.removeItem('token');
-                    navigate('/login');
-                }else{
-                    const errorDisplay = errorDict[response_msg] ||'Oops, something went wrong';
-                    console.log(err.message);
-                    toast.error(errorDisplay);
-                }; 
-            })
-        }else{
-            toast.error('請登入後再操作');
-        }
 
+                setArticles(prevArticles => 
+                    prevArticles.map(article => {
+                        if (article.id === id_) {
+                            return {
+                                ...article,
+                                claps: isCurrentlyMarked? (article.claps - 1 ): (article.claps + 1 )
+                            };
+                        };
+                        return article;
+                    })
+                );
+
+                addBookMark(id_)
+                .then(()=>{
+                    toast.success((isCurrentlyMarked ? '已取消書籤' : '有品味的選擇！'));
+                })
+                .catch((err)=>{
+                    const errorDict ={
+                        'article id is required':'無效操作',
+                        'article not exists':'文章已遺失'
+                    };
+                    const invalid = ['No such user','login expired, please retry','invalid token or unauthorized'];
+                    const response_msg = err.response?.data?.msg;
+                    if (invalid.includes(response_msg)){
+                        toast.error('登入已失效，請重新登入');
+                        localStorage.removeItem('token');
+                        navigate('/login');
+                    }else{
+                        const errorDisplay = errorDict[response_msg] ||'Oops, something went wrong';
+                        console.log(err.message);
+                        toast.error(errorDisplay);
+                    }; 
+                })
+            }else{
+                toast.error('請登入後再操作');
+            }
+        }else{
+            toast.warning('無法標記自己的文章為書籤');
+        }
     }
     
     return (
@@ -205,7 +208,7 @@ export default function Home(){
                             
                             {articles.map((article) => (
                                 <div key={article.id} onClick={()=> gotoArticle(article)} role='button' tabIndex='0' style={{...cardStyle,position:'relative'}} >
-                                    <div onClick={e=>{toggleBookmark(e, article.id)}}>
+                                    <div onClick={e=>{toggleBookmark(e, article.id, article.author)}}>
                                         <div  style={{display: 'flex', alignItems: 'center', gap: '4px', zIndex:'999', backgroundColor:'#00000000',position:'absolute',right:'20px'}}>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill={userbmkIds.includes(article.id)? "#00FA9A":"#F5F5F5"} viewBox="0 0 16 16">
                                                 <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"/>
